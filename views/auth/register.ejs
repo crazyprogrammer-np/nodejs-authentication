@@ -25,12 +25,13 @@
             <input
               type="text"
               id="fullname"
-              class="custom-input mt-4 fadeIn first"
+              class="custom-input mt-2 fadeIn first"
               name="fullName"
               placeholder="enter your full name"
               required
               autocomplete="off"
               value="<%= oldInput.value('fullName') %>"
+              autofocus
             />
 
             <input
@@ -77,11 +78,9 @@
               value=""
             />
 
-            <input
-              type="submit"
-              class="custom-btn mb-5 fadeIn fifth"
-              value="Register"
-            />
+            <button type="submit" class="custom-btn mb-5 fadeIn fifth">
+              <i class="fa fa-user-plus"></i> Register Now
+            </button>
           </form>
 
           <!-- Form Footer -->

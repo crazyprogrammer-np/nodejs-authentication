@@ -1,6 +1,7 @@
 // load .env file
 require('dotenv').config({ path: '.env' });
 
+// node packages
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require("body-parser");
@@ -10,12 +11,18 @@ const oldInput = require('old-input');
 const connectFlash = require('connect-flash');
 const path = require('path');
 
+// db connection file
 const connectDB = require('./server/database/connection');
+
+// init express
 const app = express();
 
 
 // set view engine
 app.set('view engine', 'ejs');
+
+// use express-ejs-layout
+app.use(expressLayouts);
 
 // use express json
 app.use(express.json());
@@ -33,13 +40,18 @@ app.use(expressSession({
     resave: true
 }));
 
-// use old-input
+
+/**
+ * use old-input
+ * NOTE: The "body-parser" and "express-session" middleware must be used in the app before using old-input, as old-input requires the presence of req.body and req.session.
+ */
 app.use(oldInput);
 
-// use express-ejs-layout
-app.use(expressLayouts);
-
-// use connect-flash
+// 
+/**
+ * use connect-flash
+ * NOTE: Flash messages are stored in the session. First, setup sessions as usual by enabling "cookie-parser" and "express-session" middleware. Then, use "connect-flash" middleware.
+ */
 app.use(connectFlash());
 
 // load routers

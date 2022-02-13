@@ -1,0 +1,53 @@
+<!-- Bootstrap Toast -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 999">
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer">
+    <!-- errors toast -->
+    <% if(typeof errorMessage != 'undefined') { %> <% if(errorMessage.length >
+    0) { %> <% for(i=0; i < errorMessage.length; i++) { %>
+    <div
+      class="toast align-items-center danger"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      data-bs-delay="50000"
+    >
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="fa fa-times-circle"></i> <%= errorMessage[i] %>
+        </div>
+        <button
+          type=""
+          class="btn-close me-2 m-auto toast-close"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        ></button>
+      </div>
+    </div>
+    <% } %> <% } %> <% } %>
+
+    <!-- success toast -->
+    <% if(typeof successMessage != 'undefined') { %> <% if(successMessage.length
+    > 0) { %> <% for(i=0; i < successMessage.length; i++) { %>
+    <div
+      class="toast align-items-center success"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      data-bs-delay="50000"
+    >
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="fa fa-check-circle"></i> <%= successMessage[i] %>
+        </div>
+        <button
+          type=""
+          class="btn-close me-2 m-auto toast-close"
+          data-bs-dismiss="toast"
+          aria-label="Close"
+        ></button>
+      </div>
+    </div>
+    <% } %> <% } %> <% } %>
+  </div>
+</div>

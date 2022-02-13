@@ -5,41 +5,38 @@ const { validationResult } = require('express-validator');
 
 
 /**
- * login page
+ * get /login
  */
 exports.loginPage = async (req, res) => {
 
+    // data for page
     let data = {
-        layout: './layouts/auth',
+        layout: './layouts/layout',
         title: 'User Login',
+        oldInput: req.oldInput,
         successMessage: req.flash('success'),
         errorMessage: req.flash('error')
     }
 
-    // declaring function
-    function redirectIfAuthenticated() {
-        return res.redirect('/');
-    }
-
     try {
 
-        // if have auth cookie in browser
+        // if have auth named cookie in browser
         if (req.cookies.auth) {
 
-            // get auth cookie from browser
-            const token = req.cookies.auth;
+            // get authToken from auth cookie
+            const authToken = req.cookies.auth;
 
-            // jwt varify with cookie
-            const jwtVarifyToken = jwt.verify(token, process.env.SECRET_KEY);
+            // varify authToken using jwt
+            const varifyToken = jwt.verify(authToken, process.env.SECRET_KEY);
 
-            // find user
-            const user = await User.findOne({ _id: jwtVarifyToken._id });
+            // find user from mongodb
+            const user = await User.findOne({ _id: varifyToken._id });
 
-            // if user exist
+            // if user exist in db
             if (user) {
 
-                // calling my function
-                redirectIfAuthenticated();
+                // redirect to homepage
+                return res.status(200).redirect('/');
 
             }
 
@@ -58,7 +55,8 @@ exports.loginPage = async (req, res) => {
         }
 
         // sending flash msg
-        req.flash('error', 'An Error Occured!');
+        req.flash('error', 'Something Went Wrong!');
+        req.flash('error', 'Please Log In to your account!');
 
         // redirect login page
         return res.redirect('/login');
@@ -67,42 +65,37 @@ exports.loginPage = async (req, res) => {
 }
 
 /**
- * user registeration page
+ * get /register
  */
-exports.registerUserPage = async (req, res) => {
+exports.registerPage = async (req, res) => {
 
     let data = {
-        layout: './layouts/auth',
+        layout: './layouts/layout',
         title: 'User Registrtion',
         oldInput: req.oldInput,
         successMessage: req.flash('success'),
         errorMessage: req.flash('error')
     }
 
-    // declaring function
-    function redirectIfAuthenticated() {
-        return res.redirect('/');
-    }
-
     try {
 
-        // if have auth cookie in browser
+        // if have auth named cookie in browser
         if (req.cookies.auth) {
 
-            // get auth cookie from browser
-            const token = req.cookies.auth;
+            // get authToken from auth cookie
+            const authToken = req.cookies.auth;
 
-            // jwt varify with cookie
-            const jwtVarifyToken = jwt.verify(token, process.env.SECRET_KEY);
+            // varify authToken using jwt
+            const varifyToken = jwt.verify(authToken, process.env.SECRET_KEY);
 
-            // find user
-            const user = await User.findOne({ _id: jwtVarifyToken._id });
+            // find user from mongodb
+            const user = await User.findOne({ _id: varifyToken._id });
 
-            // if user exist
+            // if user exist in db
             if (user) {
 
-                // calling my function
-                redirectIfAuthenticated();
+                // redirect to homepage
+                return res.status(200).redirect('/');
 
             }
 
@@ -121,7 +114,8 @@ exports.registerUserPage = async (req, res) => {
         }
 
         // sending flash msg
-        req.flash('error', 'An Error Occured!');
+        req.flash('error', 'Something Went Wrong!');
+        req.flash('error', 'Please Log In to your account!');
 
         // redirect login page
         return res.redirect('/register');
@@ -130,7 +124,7 @@ exports.registerUserPage = async (req, res) => {
 }
 
 /**
- * check user login
+ * post /login
  */
 exports.login = async (req, res) => {
 
@@ -151,7 +145,7 @@ exports.login = async (req, res) => {
         // if user does not exist in db
         if (!user) {
             req.flash('error', 'Cannot find User!');
-            return res.redirect('/login');
+            return res.status(404).redirect('/login');
         }
 
         // compare client's password with encrypted password in database using BCRYPT
@@ -160,40 +154,38 @@ exports.login = async (req, res) => {
         // if passwird does not varify
         if (!varifyPassword) {
             req.flash('error', 'Invalid Password!');
-            return res.redirect('/login');
+            return res.status(401).redirect('/login');
         }
 
-        // create token for user and this token has expiry of 60 days
-        const token = jwt.sign(
+        // create authToken for user and this token has expiry of 60 days
+        const authToken = jwt.sign(
             { _id: user._id },
             process.env.SECRET_KEY,
             { expiresIn: "60d" }
         );
 
-        // store token in database
-        user.tokens = user.tokens.concat({ token: token });
-        const saveToken = await user.save();
+        // store authToken in database
+        user.tokens = user.tokens.concat({ token: authToken });
 
-        if (saveToken) {
+        // if token saved in db
+        if (await user.save()) {
 
-            res.cookie('auth', token, {
-                maxAge: 5184000000, httpOnly: true
-            });
+            // create "auth" cookie in browser which have expiry of 60 days
+            res.cookie('auth', authToken, { maxAge: 5184000000, httpOnly: true });
 
+            // flash message
             req.flash('success', 'Access Granted!');
-            return res.redirect('/');
+            // redirect to authenticated
+            return res.status(200).redirect('/');
 
         }
 
     } catch (error) {
 
-        return res
-            .status(500)
-            .json({
-                error: [{
-                    message: "An error occured while logging on user api!"
-                }]
-            })
+        // flash message
+        req.flash('error', 'An Error Occured While Logging User!');
+        // redirect to login page
+        return res.status(500).redirect('/login');
 
     }
 
@@ -201,7 +193,7 @@ exports.login = async (req, res) => {
 
 
 /**
- * register new user
+ * post /register
  */
 exports.register = async (req, res) => {
 
@@ -217,7 +209,7 @@ exports.register = async (req, res) => {
             req.flash('error', errors[i].msg);
         }
 
-        return res.redirect('/register');
+        return res.status(400).redirect('/register');
 
     }
 
@@ -244,19 +236,14 @@ exports.register = async (req, res) => {
 
             req.flash('success', 'User Registered Successfully!');
             req.flash('success', 'Please Sign Into Your Account!');
-            res.redirect('/login');
+            return res.status(201).redirect('/login');
 
         }
 
     } catch (error) {
 
-        return res
-            .status(500)
-            .json({
-                error: [{
-                    message: "An error occured while registering an user api!"
-                }]
-            })
+        req.flash('error', 'An Error Occured While Registering An User!');
+        return res.status(500).redirect('/register');
 
     }
 
@@ -264,33 +251,35 @@ exports.register = async (req, res) => {
 
 
 /**
- * logout user
+ * get /logout
  */
 exports.logout = async (req, res) => {
 
     try {
 
+        // get user from middleware
+        const user = req.user;
+        // get token from middleware
+        const token = req.token;
+
         // deleting current token by filtering array of tokens in db
-        req.user.tokens = req.user.tokens.filter((currentElement) => {
-            return currentElement.token !== req.token;
+        user.tokens = user.tokens.filter((currentElement) => {
+            return currentElement.token !== token;
         });
 
-        if (await req.user.save()) return res
-            .status(200)
-            .json({
-                success: [{
-                    message: "User logged out successfully!"
-                }]
-            });
+
+        if (await user.save()) {
+            // delete cookie from browser
+            res.clearCookie("auth");
+            // flash message
+            req.flash('success', 'User Logged Out Successfully!');
+            // redirect to login
+            return res.status(200).redirect('/login');
+        }
 
 
     } catch (error) {
-        return res
-            .status(500)
-            .json({
-                error: [{
-                    message: "An error occured while user logging out!"
-                }]
-            })
+        req.flash('error', 'An Error Occured While Logging Out User!');
+        return res.status(500).redirect('/');
     }
 }

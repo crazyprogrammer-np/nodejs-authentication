@@ -3,43 +3,38 @@ const jwt = require('jsonwebtoken');
 
 exports.auth = async (req, res, next) => {
 
-    // declaring my function
-    function redirectNext(user, authToken) {
-        // assifn token and user data in request
-        req.token = authToken;
-        req.user = user;
-        return next();
-    }
-
     try {
 
-        // if have auth cookie in browser
+        // if have auth named cookie in browser
         if (req.cookies.auth) {
 
-            // get auth cookie from browser
+            // get authToken from auth cookie
             const authToken = req.cookies.auth;
 
-            // jwt varify with cookie
-            const jwtVarifyToken = jwt.verify(authToken, process.env.SECRET_KEY);
+            // varify authToken using jwt
+            const varifyToken = jwt.verify(authToken, process.env.SECRET_KEY);
 
-            // find user
-            const user = await User.findOne({ _id: jwtVarifyToken._id });
+            // find user from mongodb
+            const user = await User.findOne({ _id: varifyToken._id });
 
-            // if user exist
+            // if user exist in db
             if (user) {
 
-                // calling my function
-                redirectNext(user, authToken);
+                // sending token and user information on next request
+                req.token = authToken;
+                req.user = user;
+                return next();
 
             }
 
 
         } else {
+
             // sending flash msg
             req.flash('error', 'Access Denied!');
 
             // redirect login page
-            return res.status(400).redirect('/login');
+            return res.status(401).redirect('/login');
         }
 
 
@@ -55,7 +50,7 @@ exports.auth = async (req, res, next) => {
         req.flash('error', 'Please Log In to your account!');
 
         // redirect login page
-        return res.status(400).redirect('/login');
+        return res.status(401).redirect('/login');
 
     }
 }

@@ -27,12 +27,13 @@
             <input
               type="text"
               id="usernameOrEmail"
-              class="custom-input mt-4 fadeIn third"
+              class="custom-input mt-2 fadeIn third"
               name="username"
               placeholder="username or emai"
               required
               autocomplete="off"
-              value=""
+              autofocus
+              value="<%= oldInput.value('username') %>"
             />
 
             <input
@@ -46,11 +47,9 @@
               value=""
             />
 
-            <input
-              type="submit"
-              class="custom-btn mb-5 fadeIn fifth"
-              value="Log In"
-            />
+            <button type="submit" class="custom-btn mb-5 fadeIn fifth">
+              <i class="fa fa-sign-in-alt"></i> Log In
+            </button>
           </form>
 
           <!-- Form Footer -->
