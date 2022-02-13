@@ -11,9 +11,9 @@ const validator = require('../middleware/validations/validationRules');
 
 // routes
 route.get('/', user.auth, dashboardController.home);
-route.get('/', authController.registerUserPage);
+route.get('/register', authController.registerUserPage);
 route.post('/register', validator.newUser, authController.register);
 route.get('/login', authController.loginPage);
 route.post('/login', authController.login);
 
-module.exports = route
+module.exports = route;

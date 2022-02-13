@@ -1,0 +1,95 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div class="wrapper fadeInDown">
+        <div class="formMain">
+          <!-- Tabs Titles -->
+          <a href="/login">
+            <h2 class="formToggler inactive underlineHover">Login</h2>
+          </a>
+          <h2 class="formToggler active">Register</h2>
+
+          <!-- Icon -->
+          <div>
+            <a href="/">
+              <img
+                src="/public/img/logo.png"
+                class="site-logo fadeIn"
+                alt="User Icon"
+              />
+            </a>
+          </div>
+
+          <!-- Register Form -->
+          <form class="mt-3" method="post" action="/register">
+            <input
+              type="text"
+              id="fullname"
+              class="custom-input mt-4 fadeIn first"
+              name="fullName"
+              placeholder="enter your full name"
+              required
+              autocomplete="off"
+              value="<%= oldInput.value('fullName') %>"
+            />
+
+            <input
+              type="text"
+              id="username"
+              class="custom-input fadeIn second"
+              name="username"
+              placeholder="enter username"
+              required
+              autocomplete="off"
+              value="<%= oldInput.value('username') %>"
+            />
+
+            <input
+              type="email"
+              id="email"
+              class="custom-input fadeIn third"
+              name="email"
+              placeholder="enter email address"
+              required
+              autocomplete="off"
+              value="<%= oldInput.value('email') %>"
+            />
+
+            <input
+              type="password"
+              id="password"
+              class="custom-input fadeIn fourth"
+              name="password"
+              placeholder="enter password"
+              required
+              autocomplete="off"
+              value=""
+            />
+
+            <input
+              type="password"
+              id="confirmPassword"
+              class="custom-input fadeIn fifth"
+              name="confirmPassword"
+              placeholder="confirm password"
+              required
+              autocomplete="off"
+              value=""
+            />
+
+            <input
+              type="submit"
+              class="custom-btn mb-5 fadeIn fifth"
+              value="Register"
+            />
+          </form>
+
+          <!-- Form Footer -->
+          <div class="formFooter">
+            <a class="underlineHover" href="/login">Already Have An Account?</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

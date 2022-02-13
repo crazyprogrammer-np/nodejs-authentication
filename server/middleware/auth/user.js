@@ -13,11 +13,11 @@ exports.auth = async (req, res, next) => {
 
     try {
 
-        // if have auth_token cookie in browser
-        if (req.cookies.auth_token) {
+        // if have auth cookie in browser
+        if (req.cookies.auth) {
 
-            // get auth_token cookie from browser
-            const authToken = req.cookies.auth_token;
+            // get auth cookie from browser
+            const authToken = req.cookies.auth;
 
             // jwt varify with cookie
             const jwtVarifyToken = jwt.verify(authToken, process.env.SECRET_KEY);
@@ -46,8 +46,8 @@ exports.auth = async (req, res, next) => {
     } catch (error) {
 
         // clear cookie from this browser
-        if (req.cookies.auth_token) {
-            res.clearCookie('auth_token');
+        if (req.cookies.auth) {
+            res.clearCookie('auth');
         }
 
         // sending flash msg

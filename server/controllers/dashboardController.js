@@ -1,3 +1,4 @@
 exports.home = (req, res) => {
-    res.send('success');
+    console.log('ok')
+    return res.send('success');
 }

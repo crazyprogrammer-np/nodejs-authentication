@@ -7,15 +7,126 @@ const { validationResult } = require('express-validator');
 /**
  * login page
  */
-exports.loginPage = (req, res) => {
-    res.send('login page');
+exports.loginPage = async (req, res) => {
+
+    let data = {
+        layout: './layouts/auth',
+        title: 'User Login',
+        successMessage: req.flash('success'),
+        errorMessage: req.flash('error')
+    }
+
+    // declaring function
+    function redirectIfAuthenticated() {
+        return res.redirect('/');
+    }
+
+    try {
+
+        // if have auth cookie in browser
+        if (req.cookies.auth) {
+
+            // get auth cookie from browser
+            const token = req.cookies.auth;
+
+            // jwt varify with cookie
+            const jwtVarifyToken = jwt.verify(token, process.env.SECRET_KEY);
+
+            // find user
+            const user = await User.findOne({ _id: jwtVarifyToken._id });
+
+            // if user exist
+            if (user) {
+
+                // calling my function
+                redirectIfAuthenticated();
+
+            }
+
+        } else {
+
+            // else render login page
+            res.render('auth/login', data);
+
+        }
+
+    } catch (error) {
+
+        // clear cookie from this browser
+        if (req.cookies.auth) {
+            res.clearCookie('auth');
+        }
+
+        // sending flash msg
+        req.flash('error', 'An Error Occured!');
+
+        // redirect login page
+        return res.redirect('/login');
+
+    }
 }
 
 /**
  * user registeration page
  */
-exports.registerUserPage = (req, res) => {
-    res.send('register page');
+exports.registerUserPage = async (req, res) => {
+
+    let data = {
+        layout: './layouts/auth',
+        title: 'User Registrtion',
+        oldInput: req.oldInput,
+        successMessage: req.flash('success'),
+        errorMessage: req.flash('error')
+    }
+
+    // declaring function
+    function redirectIfAuthenticated() {
+        return res.redirect('/');
+    }
+
+    try {
+
+        // if have auth cookie in browser
+        if (req.cookies.auth) {
+
+            // get auth cookie from browser
+            const token = req.cookies.auth;
+
+            // jwt varify with cookie
+            const jwtVarifyToken = jwt.verify(token, process.env.SECRET_KEY);
+
+            // find user
+            const user = await User.findOne({ _id: jwtVarifyToken._id });
+
+            // if user exist
+            if (user) {
+
+                // calling my function
+                redirectIfAuthenticated();
+
+            }
+
+        } else {
+
+            // else render login page
+            res.render('auth/register', data);
+
+        }
+
+    } catch (error) {
+
+        // clear cookie from this browser
+        if (req.cookies.auth) {
+            res.clearCookie('auth');
+        }
+
+        // sending flash msg
+        req.flash('error', 'An Error Occured!');
+
+        // redirect login page
+        return res.redirect('/register');
+
+    }
 }
 
 /**
@@ -29,7 +140,7 @@ exports.login = async (req, res) => {
 
     try {
 
-        // matching username or email of client from mongo database
+        // find username or email of client from mongodb
         const user = await User.findOne({
             $or: [
                 { email: username },
@@ -38,17 +149,19 @@ exports.login = async (req, res) => {
         });
 
         // if user does not exist in db
-        if (!user) return res
-            .status(403)
-            .json({ error: [{ message: "Cannot find User!" }] });
+        if (!user) {
+            req.flash('error', 'Cannot find User!');
+            return res.redirect('/login');
+        }
 
         // compare client's password with encrypted password in database using BCRYPT
         const varifyPassword = await bcrypt.compare(password, user.password);
 
         // if passwird does not varify
-        if (!varifyPassword) return res
-            .status(403)
-            .json({ error: [{ message: "Invalid Password!" }] })
+        if (!varifyPassword) {
+            req.flash('error', 'Invalid Password!');
+            return res.redirect('/login');
+        }
 
         // create token for user and this token has expiry of 60 days
         const token = jwt.sign(
@@ -63,13 +176,12 @@ exports.login = async (req, res) => {
 
         if (saveToken) {
 
-            return res.header('auth_token', token).status(201)
-                .json({
-                    success: [{
-                        message: "Access Granrted!",
-                        auth_token: token
-                    }]
-                });
+            res.cookie('auth', token, {
+                maxAge: 5184000000, httpOnly: true
+            });
+
+            req.flash('success', 'Access Granted!');
+            return res.redirect('/');
 
         }
 
@@ -101,13 +213,11 @@ exports.register = async (req, res) => {
 
         let errors = validationResults.array();
 
-        let errorsMessage = [];
-
         for (let i = 0; i < errors.length; i++) {
-            errorsMessage.push({ message: errors[i].msg })
+            req.flash('error', errors[i].msg);
         }
 
-        return res.status(422).json({ error: errorsMessage });
+        return res.redirect('/register');
 
     }
 
@@ -132,12 +242,9 @@ exports.register = async (req, res) => {
 
         if (result) {
 
-            return res
-                .status(201)
-                .json({
-                    success:
-                        [{ message: "User Registered Successfully!" }]
-                })
+            req.flash('success', 'User Registered Successfully!');
+            req.flash('success', 'Please Sign Into Your Account!');
+            res.redirect('/login');
 
         }
 

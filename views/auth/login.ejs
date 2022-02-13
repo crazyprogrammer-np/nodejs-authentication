@@ -1,0 +1,64 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <div class="wrapper fadeInDown">
+        <div class="formMain">
+          <!-- Tabs Titles -->
+
+          <h2 class="formToggler active">Login</h2>
+
+          <a href="/register">
+            <h2 class="formToggler inactive underlineHover">Register</h2>
+          </a>
+
+          <!-- Icon -->
+          <div>
+            <a href="/">
+              <img
+                src="/public/img/logo.png"
+                class="site-logo fadeIn second"
+                alt="User Icon"
+              />
+            </a>
+          </div>
+
+          <!-- Login Form -->
+          <form class="mt-3" method="post" action="/login">
+            <input
+              type="text"
+              id="usernameOrEmail"
+              class="custom-input mt-4 fadeIn third"
+              name="username"
+              placeholder="username or emai"
+              required
+              autocomplete="off"
+              value=""
+            />
+
+            <input
+              type="password"
+              id="checkPassword"
+              class="custom-input fadeIn fourth"
+              name="password"
+              placeholder="enter password"
+              required
+              autocomplete="off"
+              value=""
+            />
+
+            <input
+              type="submit"
+              class="custom-btn mb-5 fadeIn fifth"
+              value="Log In"
+            />
+          </form>
+
+          <!-- Form Footer -->
+          <div class="formFooter">
+            <a class="underlineHover" href="#">Forget Password?</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
